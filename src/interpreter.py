@@ -22,13 +22,30 @@ class Interpreter():
 
         current_char = text[self.pos]
 
+        if current_char.isspace():
+            self.pos +=1
+            return get_next_token(self)
+
         if current_char.isdigit():
-            token = Token(INTEGER, int(current_char))
-            self.pos += 1
+            current_value = 0
+            while current_char.isdigit():
+                current_value = current_value * 10 + int(current_char)
+                self.pos += 1
+                if self.pos >= len(text):
+                    break
+
+                current_char = text[self.pos]
+
+            token = Token(INTEGER, current_value)
             return token
 
         if current_char == '+':
             token = Token(PLUS, current_char)
+            self.pos += 1
+            return token
+
+        if current_char == '-':
+            token = Token(MINUS, current_char)
             self.pos += 1
             return token
 
@@ -47,10 +64,16 @@ class Interpreter():
         self.eat(INTEGER)
 
         op = self.current_token
-        self.eat(PLUS)
+        if op.type == PLUS:
+            self.eat(PLUS)
+        elif op.type == MINUS:
+            self.eat(MINUS)
 
         right = self.current_token
         self.eat(INTEGER)
 
-        result = left.value + right.value
+        if op.type == PLUS:
+            result = left.value + right.value
+        elif op.type == MINUS:
+            result = left.value - right.value
         return result
