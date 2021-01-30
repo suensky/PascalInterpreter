@@ -6,9 +6,28 @@ class Interpreter():
         self.text = text
         self.pos = 0
         self.current_token = None
+        self.current_char = text[self.pos]
 
     def error(self):
         raise Exception("Error parsing input")
+
+    def advance(self):
+        self.pos += 1
+        if self.pos < len(self.text):
+            self.current_char = self.text[self.pos]
+        else:
+            self.current_char = None
+
+    def skip_whitespaces(self):
+        while self.current_char is not None and self.current_char.isspace():
+            self.advance()
+
+    def integer(self):
+        result = 0
+        while self.current_char is not None and self.current_char.isdigit():
+            result = result * 10 + int(self.current_char)
+            self.advance()
+        return result
 
     def get_next_token(self):
         """Lexical analyzer, also known as tokenizer or scanner
@@ -23,30 +42,20 @@ class Interpreter():
         current_char = text[self.pos]
 
         if current_char.isspace():
-            self.pos +=1
-            return get_next_token(self)
+            self.skip_whitespaces()
+            return self.get_next_token()
 
         if current_char.isdigit():
-            current_value = 0
-            while current_char.isdigit():
-                current_value = current_value * 10 + int(current_char)
-                self.pos += 1
-                if self.pos >= len(text):
-                    break
-
-                current_char = text[self.pos]
-
-            token = Token(INTEGER, current_value)
-            return token
+            return Token(INTEGER, self.integer())
 
         if current_char == '+':
             token = Token(PLUS, current_char)
-            self.pos += 1
+            self.advance()
             return token
 
         if current_char == '-':
             token = Token(MINUS, current_char)
-            self.pos += 1
+            self.advance()
             return token
 
         self.error()
