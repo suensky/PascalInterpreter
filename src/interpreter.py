@@ -69,20 +69,17 @@ class Interpreter():
     def expr(self):
         self.current_token = self.get_next_token()
 
-        left = self.current_token
-        self.eat(INTEGER)
+        result = 0
+        op_value = 1
+        while self.current_token.type != EOF:
+            if self.current_token.type == INTEGER:
+                result += op_value * self.current_token.value
+                self.eat(INTEGER)
+            elif self.current_token.type == PLUS:
+                op_value = 1
+                self.eat(PLUS)
+            elif self.current_token.type == MINUS:
+                op_value = -1
+                self.eat(MINUS)
 
-        op = self.current_token
-        if op.type == PLUS:
-            self.eat(PLUS)
-        elif op.type == MINUS:
-            self.eat(MINUS)
-
-        right = self.current_token
-        self.eat(INTEGER)
-
-        if op.type == PLUS:
-            result = left.value + right.value
-        elif op.type == MINUS:
-            result = left.value - right.value
         return result
