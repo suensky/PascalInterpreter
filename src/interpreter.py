@@ -8,6 +8,9 @@ class Interpreter():
         self.current_token = None
         self.current_char = text[self.pos]
 
+    ##########################################################
+    # Lexer code                                             #
+    ##########################################################
     def error(self):
         raise Exception("Error parsing input")
 
@@ -60,26 +63,30 @@ class Interpreter():
 
         self.error()
 
+    ##########################################################
+    # Parser / Interpreter code                              #
+    ##########################################################
     def eat(self, token_type):
         if self.current_token.type == token_type:
             self.current_token = self.get_next_token()
         else:
             self.error()
 
+    def term(self):
+        token = self.current_token
+        self.eat(INTEGER)
+        return token.value
+
     def expr(self):
         self.current_token = self.get_next_token()
 
-        result = 0
-        op_value = 1
-        while self.current_token.type != EOF:
-            if self.current_token.type == INTEGER:
-                result += op_value * self.current_token.value
-                self.eat(INTEGER)
-            elif self.current_token.type == PLUS:
-                op_value = 1
+        result = self.term()
+        while self.current_token.type in (PLUS, MINUS):
+            if self.current_token.type == PLUS:
                 self.eat(PLUS)
+                result = result + self.term()
             elif self.current_token.type == MINUS:
-                op_value = -1
                 self.eat(MINUS)
+                result = result - self.term()
 
         return result
