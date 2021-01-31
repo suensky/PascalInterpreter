@@ -61,6 +61,16 @@ class Interpreter():
             self.advance()
             return token
 
+        if current_char == '*':
+            token = Token(MUL, current_char)
+            self.advance()
+            return token
+
+        if current_char == '/':
+            token = Token(DIV, current_char)
+            self.advance()
+            return token
+
         self.error()
 
     ##########################################################
@@ -80,13 +90,26 @@ class Interpreter():
     def expr(self):
         self.current_token = self.get_next_token()
 
-        result = self.term()
-        while self.current_token.type in (PLUS, MINUS):
+        # keep track of the expr with left_val + right_op * right_val
+        left_val = 0
+        right_val = self.term()
+        right_op = 1
+        while self.current_token.type in (PLUS, MINUS, MUL, DIV):
             if self.current_token.type == PLUS:
                 self.eat(PLUS)
-                result = result + self.term()
+                left_val = left_val + right_op * right_val
+                right_val = self.term()
+                right_op = 1
             elif self.current_token.type == MINUS:
                 self.eat(MINUS)
-                result = result - self.term()
+                left_val = left_val + right_op * right_val
+                right_val = self.term()
+                right_op = -1
+            elif self.current_token.type == MUL:
+                self.eat(MUL)
+                right_val *= self.term()
+            elif self.current_token.type == DIV:
+                self.eat(DIV)
+                right_val /= self.term()
 
-        return result
+        return left_val + right_op * right_val
