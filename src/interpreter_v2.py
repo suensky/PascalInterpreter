@@ -5,8 +5,8 @@ class Interpreter():
         # client string input, e.g., 3+5
         self.text = text
         self.pos = 0
+        self.current_token = None
         self.current_char = text[self.pos]
-        self.current_token = self.get_next_token()
 
     ##########################################################
     # Lexer code                                             #
@@ -71,16 +71,6 @@ class Interpreter():
             self.advance()
             return token
 
-        if current_char == '(':
-            token = Token(LPAREN, current_char)
-            self.advance()
-            return token
-
-        if current_char == ')':
-            token = Token(RPAREN, current_char)
-            self.advance()
-            return token
-
         self.error()
 
     ##########################################################
@@ -93,17 +83,10 @@ class Interpreter():
             self.error()
 
     def factor(self):
-        """factor: INTEGER | LPAREN expr RPAREN"""
+        """factor: INTEGER"""
         token = self.current_token
-        if token.type == INTEGER:
-            self.eat(INTEGER)
-            return token.value
-
-        if token.type == LPAREN:
-            self.eat(LPAREN)
-            result = self.expr()
-            self.eat(RPAREN)
-            return result
+        self.eat(INTEGER)
+        return token.value
 
     def term(self):
         """term: factor((MUL | DIV)factor)* """
@@ -121,6 +104,7 @@ class Interpreter():
 
     def expr(self):
         """expr: term((PLUS|MINUS)term)* """
+        self.current_token = self.get_next_token()
 
         # keep track of the expr with left_val + right_op * right_val
         result = self.term()
