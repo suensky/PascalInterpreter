@@ -1,5 +1,5 @@
 from interpreter import Interpreter
-from token import Token
+from lexer import Lexer
 
 def main():
     while True:
@@ -11,7 +11,8 @@ def main():
         if not text:
             continue
 
-        interpreter = Interpreter(text)
+        lexer = Lexer(text)
+        interpreter = Interpreter(lexer)
         result = interpreter.expr()
         print(result)
 
