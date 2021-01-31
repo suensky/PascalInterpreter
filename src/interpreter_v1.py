@@ -82,38 +82,34 @@ class Interpreter():
         else:
             self.error()
 
-    def factor(self):
-        """factor: INTEGER"""
+    def term(self):
         token = self.current_token
         self.eat(INTEGER)
         return token.value
 
-    def term(self):
-        """term: factor((MUL | DIV)factor)* """
-        result = self.factor()
-
-        while self.current_token.type in (MUL, DIV):
-            if self.current_token.type == MUL:
-                self.eat(MUL)
-                result *= self.factor()
-            else:
-                self.eat(DIV)
-                result /= self.factor()
-
-        return result
-
     def expr(self):
-        """expr: term((PLUS|MINUS)term)* """
         self.current_token = self.get_next_token()
 
         # keep track of the expr with left_val + right_op * right_val
-        result = self.term()
-        while self.current_token.type in (PLUS, MINUS):
+        left_val = 0
+        right_val = self.term()
+        right_op = 1
+        while self.current_token.type in (PLUS, MINUS, MUL, DIV):
             if self.current_token.type == PLUS:
                 self.eat(PLUS)
-                result += self.term()
-            else:
+                left_val = left_val + right_op * right_val
+                right_val = self.term()
+                right_op = 1
+            elif self.current_token.type == MINUS:
                 self.eat(MINUS)
-                result -= self.term()
+                left_val = left_val + right_op * right_val
+                right_val = self.term()
+                right_op = -1
+            elif self.current_token.type == MUL:
+                self.eat(MUL)
+                right_val *= self.term()
+            elif self.current_token.type == DIV:
+                self.eat(DIV)
+                right_val /= self.term()
 
-        return result
+        return left_val + right_op * right_val
