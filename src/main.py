@@ -1,4 +1,4 @@
-from interpreter import Interpreter
+from parser import Parser
 from lexer import Lexer
 
 def main():
@@ -12,8 +12,8 @@ def main():
             continue
 
         lexer = Lexer(text)
-        interpreter = Interpreter(lexer)
-        result = interpreter.expr()
+        parser = Parser(lexer)
+        result = parser.expr()
         print(result)
 
 if __name__ == '__main__':
