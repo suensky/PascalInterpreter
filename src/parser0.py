@@ -23,7 +23,7 @@ class Parser():
             self.eat(LPAREN)
             node = self.expr()
             self.eat(RPAREN)
-            return BinOp(node)
+            return node
 
     def term(self):
         """term: factor((MUL | DIV)factor)* """
@@ -53,3 +53,6 @@ class Parser():
             node = BinOp(left=node, op=token, right=self.term())
 
         return node
+
+    def parse(self):
+        return self.expr()

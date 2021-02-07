@@ -182,6 +182,8 @@ def main():
     viz = ParseTreeVisualizer(parser)
     content = viz.gendot()
     print(content)
+    with open("parsetree.dot", "w") as text_file:
+        print(content, file=text_file)
 
 
 if __name__ == '__main__':

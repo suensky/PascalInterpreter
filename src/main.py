@@ -1,5 +1,6 @@
-from parser import Parser
+from parser0 import Parser
 from lexer import Lexer
+from interpreter import Interpreter
 
 def main():
     while True:
@@ -13,7 +14,8 @@ def main():
 
         lexer = Lexer(text)
         parser = Parser(lexer)
-        result = parser.expr()
+        interpreter = Interpreter(parser)
+        result = interpreter.interpret()
         print(result)
 
 if __name__ == '__main__':
