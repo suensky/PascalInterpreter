@@ -14,6 +14,13 @@ class Interpreter(NodeVisitor):
     def __init__(self, parser):
         self.parser = parser
 
+    def visit_UnaryOp(self, node):
+        op = node.op.type
+        if op == PLUS:
+            return +self.visit(node.expr)
+        if op == MINUS:
+            return -self.visit(node.expr)
+
     def visit_BinOp(self, node):
         if node.op.type == PLUS:
             return self.visit(node.left) + self.visit(node.right)
